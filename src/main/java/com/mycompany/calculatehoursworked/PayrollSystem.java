@@ -27,25 +27,74 @@ import java.util.Scanner;
 // ===== MAIN CLASS =====
 // declare a public class named PayrollSystem
 // all program logic exists inside this class
+
+/**
+ *
+ * @author synen
+ */
 public class PayrollSystem {
     
     // ==== GLOBAL VARIABLES ====
     
     // file paths used across the application
+
+    /**
+     *
+     */
     public static final String EMP_FILE = "src\\main\\java\\com\\mycompany\\calculatehoursworked\\employee_details.csv";
+
+    /**
+     *
+     */
     public static final String ATT_FILE = "src\\main\\java\\com\\mycompany\\calculatehoursworked\\attendance_record.csv";
     
     //centralize year value to avoid hardcoding
+
+    /**
+     *
+     */
     public static final int YEAR = 2024;
     
     // CSV column indices for consistent reference
+
+    /**
+     *
+     */
     public static final int COL_EMP_NO = 0;
+
+    /**
+     *
+     */
     public static final int COL_LAST_NAME = 1;
+
+    /**
+     *
+     */
     public static final int COL_FIRST_NAME = 2;
+
+    /**
+     *
+     */
     public static final int COL_BIRTHDAY = 3;
+
+    /**
+     *
+     */
     public static final int COL_HOURLY_RATE = 18;
+
+    /**
+     *
+     */
     public static final int COL_DATE = 3;
+
+    /**
+     *
+     */
     public static final int COL_LOGIN = 4;
+
+    /**
+     *
+     */
     public static final int COL_LOGOUT = 5;
     
     // ==== METHODS ====
@@ -55,6 +104,12 @@ public class PayrollSystem {
     // double -> returns decimal value
     // computeSSS -> method name
     // grossSalary -> input parameter
+
+    /**
+     *
+     * @param grossSalary
+     * @return
+     */
     public static double computeSSS(double grossSalary) {
         // sss method computes employee SSS contribution based on gross salary (reference: SSS Contribution.csv from MotorPH website)
         // check ranges and return corresponding contribution
@@ -87,6 +142,12 @@ public class PayrollSystem {
     // static -> can run without creating an object
     // double -> returns decimal value
     // grossSalary -> input parameter
+
+    /**
+     *
+     * @param grossSalary
+     * @return
+     */
     public static double computePhilHealth(double grossSalary) {
         double premium = grossSalary * 0.03; // compute 3% of monthly basic/gross
         if (grossSalary <= 10000) premium = 300; // check if computed premium is below minimum threshold then force minimum contribution rule
@@ -97,6 +158,12 @@ public class PayrollSystem {
     // Pag-IBIG Contribution
     // computes employee pag-ibig contribution based on salary
     // 1% if salary <= 1500, otherwise 2%
+
+    /**
+     *
+     * @param grossSalary
+     * @return
+     */
     public static double computePagIbig(double grossSalary) {
         double contribution; // declaring varibale that will store contribution value
         if (grossSalary <= 1500)  // check if salary is 1500 or below
@@ -109,6 +176,12 @@ public class PayrollSystem {
     // Withholding Tax
     // computes income tax based on taxable income
     // taxable income = gross - sss - philhealth - pag-ibig
+
+    /**
+     *
+     * @param taxableIncome
+     * @return
+     */
     public static double computeWithholdingTax(double taxableIncome) {
         if (taxableIncome <= 20832)  // if taxable income is within tax free bracket
             return 0; // no tax deduction
@@ -126,6 +199,13 @@ public class PayrollSystem {
     
     // HOURS COMPUTATION
     // calculates how many payable work hours an employee completed
+
+    /**
+     *
+     * @param login
+     * @param logout
+     * @return
+     */
     public static double computeHours(LocalTime login, LocalTime logout) {
         
         // created a LocalTime object representing 8:10 AM
@@ -175,6 +255,19 @@ public class PayrollSystem {
     // helper method for displaying payroll information aka Display Payroll Module
     // receives employee info and computed attendance data
     // this method is method chaining where one method orchestrates many smaller methods and this is what you call modular programming
+
+    /**
+     *
+     * @param empNo
+     * @param lastName
+     * @param firstName
+     * @param birthday
+     * @param firstHalf
+     * @param secondHalf
+     * @param hourlyRate
+     * @param monthName
+     * @param monthDays
+     */
     public static void displayPayroll(
             String empNo, // employee number
             String lastName, // employee last name
@@ -230,6 +323,14 @@ public class PayrollSystem {
     
     // helper method tht computes total worked hours
     // for both payroll cutoffs of a specific month
+
+    /**
+     *
+     * @param empNo
+     * @param attFile
+     * @param month
+     * @return
+     */
     public static double[] computeAttendance(
             String empNo, // employee number to search
             String attFile, // attendance csv file path
@@ -290,6 +391,13 @@ public class PayrollSystem {
     
     // helper method for processing payroll for employee
     // for one employee across multiple months
+
+    /**
+     *
+     * @param empNo
+     * @param EMP_FILE
+     * @param ATT_FILE
+     */
     public static void processPayrollForEmp(String empNo, String EMP_FILE, String ATT_FILE) {
         // try-with-resources automatically closes the file
         try(BufferedReader br = new BufferedReader(new FileReader(EMP_FILE))) {
@@ -336,6 +444,11 @@ public class PayrollSystem {
     
     // ==== MAIN PROGRAM ====
     // executio of the Java program starts here
+
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         // create scanner object to allow keyboard input
         Scanner scanner = new Scanner(System.in);
