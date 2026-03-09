@@ -149,8 +149,6 @@ public class PayrollSystem {
             return 8.0;
             }
         
-        hours = Math.min(hours, 8.0);
-        
         // return final payable hours, capped at 8
         return Math.min(hours, 8.0);
     }   
