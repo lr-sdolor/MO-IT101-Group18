@@ -105,16 +105,6 @@ public class PayrollSystem {
             return 200833.33 + ((taxableIncome - 666667) * 0.35); // base tax plus 35% of remaining income
     }
     
-    // Money Rounding Method
-    // ensures all monetary values are rounded to 2 decimal places like real currency
-    public static double roundMoney(double value) {
-        // multiply value by 100
-        // example: 123.456 -> 12345.6
-        // Math.round removes extra decimals
-        // divide again by 100 to restore peso format
-        return Math.round(value * 100.0) / 100.0;
-    }
-    
     // HOURS COMPUTATION
     // calculates how many payable work hours an employee completed
     public static double computeHours(LocalTime login, LocalTime logout) {
@@ -162,7 +152,7 @@ public class PayrollSystem {
         hours = Math.min(hours, 8.0);
         
         // return final payable hours, capped at 8
-        return Math.round((hours * 100.0)/100.0);
+        return Math.min(hours, 8.0);
     }   
     
     // helper method for displaying payroll information aka Display Payroll Module
@@ -181,24 +171,24 @@ public class PayrollSystem {
         
         // compute gross salary for the cutoffs
         // hours worked x hourly rate
-        double gross1 = roundMoney(firstHalf * hourlyRate);
-        double gross2 = roundMoney(secondHalf * hourlyRate);
+        double gross1 = firstHalf * hourlyRate;
+        double gross2 = secondHalf * hourlyRate;
         
         // compute total monthly gross salary
-        double monthlyGross = roundMoney(gross1 + gross2);
+        double monthlyGross = gross1 + gross2;
         
         // call deduction methods
-        double sss = roundMoney(computeSSS(monthlyGross));
-        double phil = roundMoney(computePhilHealth(monthlyGross));
-        double pagibig = roundMoney(computePagIbig(monthlyGross));
-        double tax = roundMoney(computeWithholdingTax(monthlyGross));
+        double sss = computeSSS(monthlyGross);
+        double phil = computePhilHealth(monthlyGross);
+        double pagibig = computePagIbig(monthlyGross);
+        double tax = computeWithholdingTax(monthlyGross);
         
         // add all deductions together
-        double totalDeductions = roundMoney(sss + phil + pagibig + tax);
+        double totalDeductions = sss + phil + pagibig + tax;
         
         // net pay for cutoffs
-        double net1 = roundMoney(gross1);
-        double net2 = roundMoney(gross2 - totalDeductions); // net pay after deductions
+        double net1 = gross1;
+        double net2 = gross2 - totalDeductions; // net pay after deductions
         
         // display employee and payroll information
         System.out.println("\n================ "+ monthName + " ================");
@@ -380,6 +370,8 @@ public class PayrollSystem {
                         if(line.trim().isEmpty()) continue; // skip empty lines
                         String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"); // split csv safely with quoted commas
                         if(data[0].equals(empNo)) { // check if employee number matches output
+                            // int COL_EMP_NO = 0;
+                            // if(data[COL_EMP_NO].equals(empNo))
                             found = true; // employee exists
                             // display employee information
                             System.out.println("\n===================================");
