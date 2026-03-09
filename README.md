@@ -12,6 +12,15 @@ Synen Dolor
 Moriah Edoc
 - Participated in drafting the initial logic for the hours computation and deduction rules during the planning stage and contributed ideas for how the calculations should be handled in the program. Also reviewed and refined the computation logic drafted during the planning phase.
 
+John Merick Carryle Tarcena
+- Assisted in the initial drafting of the computation and deduction logic and provided input during the early planning and review discussions.
+
+Yves Lauren Marcaida
+- Contributed to drafting the computation approach and participated in reviewing the proposed deduction logic during the design phase.
+
+Ma. Diana Salvidar
+- Assisted in outlining the hours computation and deduction rules and participated in discussions regarding how these should be applied in the system.
+
 MotorPH Payroll System Development Team
 
 ---
