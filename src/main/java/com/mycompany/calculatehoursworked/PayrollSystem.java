@@ -30,7 +30,7 @@ import java.util.Scanner;
 
 /**
  *
- * @author synen
+ * Sample Change
  */
 public class PayrollSystem {
     
