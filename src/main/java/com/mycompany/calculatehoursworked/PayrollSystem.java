@@ -475,14 +475,13 @@ public class PayrollSystem {
         if(username.equals("employee") && password.equals("12345")) { // check if logged-in user is an employee
             while(true) { // infinite loop until user exits
                 // show employee menu or options
-                System.out.println("=======================");
+                System.out.println("=========MENU==========");
                 System.out.println("Choose the between 1 or 2:");
-                System.out.println("\n1. Enter Employee Number");
-                System.out.println("\n2. Exit Program");
+                System.out.println("1. Enter Employee Number");
+                System.out.println("2. Exit Program");
                 System.out.println("=======================");
                 int choice = scanner.nextInt(); // read menu choice
                 scanner.nextLine(); // consume leftover newline character
-                
                 if(choice == 2) { // exit program if user selects option 2
                     break;
                 } else if(choice != 1 && choice != 2) {
@@ -507,7 +506,7 @@ public class PayrollSystem {
                             // if(data[COL_EMP_NO].equals(empNo))
                             found = true; // employee exists
                             // display employee information
-                            System.out.println("=======================");
+                            System.out.println("=====EMPLOYEE INFO=====");
                             System.out.println("Employee # : " + data[0]);
                             System.out.println("Employee Name : " + data[1] + ", " + data[2]);
                             System.out.println("Birthday : " + data[3]);
@@ -527,21 +526,26 @@ public class PayrollSystem {
         // check if payroll staff logged in
         if(username.equals("payroll_staff") && password.equals("12345")) {
             while(true) {
+                System.out.println("=========MENU==========");
+                System.out.println("Choose the between 1 or 2:");
+                System.out.println("1. Process Payroll");
+                System.out.println("2. Exit Program");
                 System.out.println("=======================");
-                System.out.println("\n1. Process Payroll");
-                System.out.println("\n2. Exit Program");
                 int choice = scanner.nextInt();
                 scanner.nextLine();
-                if (choice == 2) {
+                if(choice == 2) { // exit program if user selects option 2
                     break;
-                } else if (choice != 1) {
-                    System.out.println("Invalid choice. Please input 1 or 2 only.");
+                } else if(choice != 1 && choice != 2) {
+                    System.out.println("=======================");
+                    System.out.println("Invalid option. Please enter 1 or 2.");
                     continue;
                 }
-                
-                System.out.println("\n1. One Employee");
-                System.out.println("\n2. All Employees");
-                System.out.println("\n3. Exit Program");
+                System.out.println("=======================");
+                System.out.println("====PROCESS PAYROLL====");
+                System.out.println("1. One Employee");
+                System.out.println("2. All Employees");
+                System.out.println("3. Exit Program");
+                System.out.println("=======================");
                 int subChoice = scanner.nextInt();
                 scanner.nextLine();
                 if (subChoice == 3) {
@@ -552,6 +556,7 @@ public class PayrollSystem {
                 }
                 
                 if(subChoice == 1) {
+                    System.out.println("=======================");
                     System.out.print("Enter Employee Number: ");
                     String empNo  = scanner.nextLine();
                     processPayrollForEmp(empNo, EMP_FILE, ATT_FILE); // call payroll processor method
