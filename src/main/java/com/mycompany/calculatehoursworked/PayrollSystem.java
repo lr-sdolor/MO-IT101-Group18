@@ -239,17 +239,13 @@ public class PayrollSystem {
         
         // convert minutes into decimal hours
         // example: 420 minutes/60 = 7 hours
-        double hours = minutesWorked / 60.0;
-        
-        // grace period rule
-        // check if login time is not after grace period
-        // meaning employee arrived on or before 8:10 AM
-        if (!login.isAfter(graceTime)) {
+    
+     
+          if (!login.isAfter(graceTime)) {
             return 8.0;
-            }
-        
-        // return final payable hours, capped at 8
-        return Math.min(hours, 8.0);
+        }
+
+        return Math.min(minutesWorked / 60.0, 8.0);
     }   
     
     // helper method for displaying payroll information aka Display Payroll Module
@@ -464,7 +460,7 @@ public class PayrollSystem {
             System.out.println("Login Successful!"); // login success message
         }
         else if (username.equals("payroll_staff") && password.equals("12345")) { // check if login matches payroll staff account
-            System.out.println("Login Sucessful!"); // login success message
+            System.out.println("Login Successful!"); // login success message
         }
         else { // run if username or password is incorrect
             System.out.println("Incorrect username or password"); // deny system access
