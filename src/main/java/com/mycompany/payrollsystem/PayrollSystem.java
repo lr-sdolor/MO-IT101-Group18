@@ -118,21 +118,45 @@ public class PayrollSystem {
      */
     public static final int COL_LOGOUT = 5;
     
+    // loads employee file into memory (List of String arrays)
+    public static List<String[]> loadEmployees(String EMP_FILE) {
+        List<String[]> employees = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(EMP_FILE))) {
+            br.readLine(); // skip header
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+
+                // split csv safely (handles commas inside quotes)
+                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                employees.add(data);
+            }
+        } catch (Exception e) {
+            System.out.println("Error reading employee file.");
+            e.printStackTrace();
+        }
+
+        return employees;
+    }
+
+    // loads attendance csv file into Attendance objects
     public static List<Attendance> loadAttendance(String ATT_FILE) {
         List<Attendance> records = new ArrayList<>();
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
-        
+
         try (BufferedReader br = new BufferedReader(new FileReader(ATT_FILE))) {
-            br.readLine();
+            br.readLine(); // skip header
             String line;
-            
+
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
-                
+
                 String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-                
+
                 String empNo = data[COL_EMP_NO];
-                
+
                 String[] dateParts = data[COL_DATE].split("/");
                 int month = Integer.parseInt(dateParts[0]);
                 int day = Integer.parseInt(dateParts[1]);
@@ -140,16 +164,17 @@ public class PayrollSystem {
 
                 LocalTime login = LocalTime.parse(data[COL_LOGIN].trim(), timeFormat);
                 LocalTime logout = LocalTime.parse(data[COL_LOGOUT].trim(), timeFormat);
-                
+
                 records.add(new Attendance(empNo, month, day, year, login, logout));
             }
         } catch (Exception e) {
             System.out.println("Error loading attendance file.");
             e.printStackTrace();
         }
-        
+
         return records;
     }
+    
     
     // ==== METHODS ====
     // SSS Contribution
@@ -411,57 +436,128 @@ public class PayrollSystem {
     
     // helper method for processing payroll for employee
     // for one employee across multiple months
-
+        // finds employee using employee number
+    public static String[] findEmployee(List<String[]> employees, String empNo) {
+        for (String[] emp : employees) {
+            if (emp[COL_EMP_NO].equals(empNo)) {
+                return emp;
+            }
+        }
+        return null; // employee not found
+    }
     /**
      *
-     * @param empNo
+     * @param emp
      * @param EMP_FILE
      * @param records
      */
-    public static void processPayrollForEmp(String empNo, String EMP_FILE, List<Attendance> records) {
-        // try-with-resources automatically closes the file
-        try(BufferedReader br = new BufferedReader(new FileReader(EMP_FILE))) {
-            br.readLine(); //skip header
-            String line; // variable that stores each line read from file
-            boolean found = false; // flag used to check if employee exists
-            while((line = br.readLine()) != null) { // loop through entire employee file
-                if(line.trim().isEmpty()) continue; // skip empty lines
-                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"); // split csv row into columns safely because for some reason hourlyRate kept getting returned as "1"; reason being that the filereader parses it incorrectly due to the existing commas in some of the columns/indices in employee_details.csv 
-                if(data[COL_EMP_NO].equals(empNo)) { // check if employee number matches input
-                    String lastName = data[COL_LAST_NAME]; // store employee last name
-                    String firstName = data[COL_FIRST_NAME];// store employee first name
-                    String birthday = data[COL_BIRTHDAY]; // store birthday
-                    double hourlyRate = Double.parseDouble(data[COL_HOURLY_RATE]); // convert hourly rate text into double value
-                    found = true; // mark employee as found
-                    
-                    // Loop months from June to Recember
-                    for(int month = 6; month <= 12; month++) {
-                        String monthName = switch(month) { // convert month number into readable name
-                            case 6 -> "June";
-                            case 7 -> "July";
-                            case 8 -> "August";
-                            case 9 -> "September";
-                            case 10 -> "October";
-                            case 11 -> "November";
-                            case 12 -> "December";
-                            default -> "Month "+month; // fallback safety case
-                        };
-                        int monthDays = YearMonth.of(YEAR, month).lengthOfMonth(); // determine number of days in month
-                        double[] hours = computeAttendance(empNo, records, month); // compute attendance hours
-                        displayPayroll(empNo, lastName, firstName, birthday, hours[0], hours[1], hourlyRate, monthName, monthDays); // display payroll using computed data
-                    }
-                    break; // stop searching once employee is processed
-                }
+    // processes payroll for ONE employee
+        public static void processPayrollForEmployee(String[] emp, List<Attendance> records) {
+
+            String empNo = emp[COL_EMP_NO];
+            String lastName = emp[COL_LAST_NAME];
+            String firstName = emp[COL_FIRST_NAME];
+            String birthday = emp[COL_BIRTHDAY];
+            double hourlyRate = Double.parseDouble(emp[COL_HOURLY_RATE]);
+
+            for (int month = 6; month <= 12; month++) {
+
+                String monthName = switch(month) {
+                    case 6 -> "June";
+                    case 7 -> "July";
+                    case 8 -> "August";
+                    case 9 -> "September";
+                    case 10 -> "October";
+                    case 11 -> "November";
+                    case 12 -> "December";
+                    default -> "Month "+month;
+                };
+
+                int monthDays = YearMonth.of(YEAR, month).lengthOfMonth();
+
+                double[] hours = computeAttendance(empNo, records, month);
+
+                displayPayroll(empNo, lastName, firstName, birthday,
+                        hours[0], hours[1], hourlyRate, monthName, monthDays);
             }
-            if(!found) { // if employee was never found in file
-                System.out.println("Employee number does not exist."); // inform user employee number is valid
-            } 
-        } catch(Exception e) { // catch file or parsing errors
-                System.out.println("Error reading employee file."); // display readable error message
-                e.printStackTrace(); // print technical debugging details/errors
+        }
+
+    // processes payroll for ALL employees
+    public static void processPayrollForAllEmployees(List<String[]> employees, List<Attendance> records) {
+        for (String[] emp : employees) {
+            processPayrollForEmployee(emp, records);
         }
     }
     
+    
+    public static void handleEmployeeFlow(Scanner scanner, List<String[]> employees) {
+
+        while(true) {
+            System.out.println("\n1. Enter Employee Number");
+            System.out.println("\n2. Exit Program");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            if(choice == 2) break;
+
+            System.out.print("Enter Employee Number: ");
+            String empNo = scanner.nextLine();
+
+            String[] emp = findEmployee(employees, empNo);
+
+            if(emp != null) {
+                System.out.println("\n===================================");
+                System.out.println("Employee # : " + emp[0]);
+                System.out.println("Employee Name : " + emp[1] + ", " + emp[2]);
+                System.out.println("Birthday : " + emp[3]);
+                System.out.println("===================================");
+            } else {
+                System.out.println("Employee number does not exist.");
+            }
+        }
+    }    
+
+    public static void handlePayrollFlow(Scanner scanner, List<String[]> employees, List<Attendance> records) {
+        while(true) {
+            System.out.println("\n1. Process Payroll");
+            System.out.println("\n2. Exit Program");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            if(choice == 2) break;
+            if(choice != 1) {
+                System.out.println("Invalid choice. Please input 1 or 2 only.");
+                continue;
+            }
+
+            System.out.println("\n1. One Employee");
+            System.out.println("\n2. All Employees");
+            System.out.println("\n3. Exit Program");
+
+            int subChoice = scanner.nextInt();
+            scanner.nextLine();
+
+            if(subChoice == 3) break;
+
+            if(subChoice == 1) {
+                System.out.print("Enter Employee Number: ");
+                String empNo = scanner.nextLine();
+
+                String[] emp = findEmployee(employees, empNo);
+
+                if(emp != null)
+                    processPayrollForEmployee(emp, records);
+                else
+                    System.out.println("Employee number does not exist.");
+            }
+
+            if(subChoice == 2) {
+                processPayrollForAllEmployees(employees, records);
+            }
+        }
+    }    
     // ==== MAIN PROGRAM ====
     // executio of the Java program starts here
 
@@ -469,121 +565,31 @@ public class PayrollSystem {
      *
      * @param args
      */
+    
     public static void main(String[] args) {
-        // create scanner object to allow keyboard input
+
         Scanner scanner = new Scanner(System.in);
+
+        List<String[]> employees = loadEmployees(EMP_FILE);
         List<Attendance> attendanceRecords = loadAttendance(ATT_FILE);
-        
-        // display login system title
+
         System.out.println("==== MOTORPH LOGIN ====");
-        System.out.print("Username: "); // ask use to enter username
-        String username = scanner.nextLine().trim(); // read username input and remove extra spaces using trim()
-        System.out.print("Password: "); // ask user to enter password
-        String password = scanner.nextLine().trim(); // read password input and remove extra spaces using trim()
-        
-        if(username.equals("employee") && password.equals("12345")) { // check if login matches employee account
-            System.out.println("Login Successful!"); // login success message
+        System.out.print("Username: ");
+        String username = scanner.nextLine().trim();
+
+        System.out.print("Password: ");
+        String password = scanner.nextLine().trim();
+
+        if(username.equals("employee") && password.equals("12345")) {
+            System.out.println("Login Successful!");
+            handleEmployeeFlow(scanner, employees);
         }
-        else if (username.equals("payroll_staff") && password.equals("12345")) { // check if login matches payroll staff account
-            System.out.println("Login Sucessful!"); // login success message
+        else if (username.equals("payroll_staff") && password.equals("12345")) {
+            System.out.println("Login Sucessful!");
+            handlePayrollFlow(scanner, employees, attendanceRecords);
         }
-        else { // run if username or password is incorrect
-            System.out.println("Incorrect username or password"); // deny system access
-        }
-        
-        // employee flow
-        if(username.equals("employee") && password.equals("12345")) { // check if logged-in user is an employee
-            while(true) { // infinite loop until user exits
-                // show employee menu or options
-                System.out.println("\n1. Enter Employee Number");
-                System.out.println("\n2. Exit Program");
-                int choice = scanner.nextInt(); // read menu choice
-                scanner.nextLine(); // consume leftover newline character
-                
-                if(choice == 2) { // exit program if user selects option 2
-                    break;
-                }
-                
-                System.out.print("Enter Employee Number: "); // ask for employee number
-                String empNo = scanner.nextLine(); // read employee number
-                boolean found = false; // flag to check if employee exists
-                
-                // opem employee file safely
-                try(BufferedReader br = new BufferedReader(new FileReader(EMP_FILE))) {
-                    br.readLine(); // skip header
-                    String line;
-                    while((line = br.readLine()) != null) { // continue reading until end of line
-                        if(line.trim().isEmpty()) continue; // skip empty lines
-                        String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"); // split csv safely with quoted commas
-                        if(data[0].equals(empNo)) { // check if employee number matches output
-                            // int COL_EMP_NO = 0;
-                            // if(data[COL_EMP_NO].equals(empNo))
-                            found = true; // employee exists
-                            // display employee information
-                            System.out.println("\n===================================");
-                            System.out.println("Employee # : " + data[0]);
-                            System.out.println("Employee Name : " + data[1] + ", " + data[2]);
-                            System.out.println("Birthday : " + data[3]);
-                            System.out.println("===================================");
-                            break; // stop searching once found
-                        }
-                    }
-                    if(!found) {
-                        System.out.println("Employee number does not exist."); // show error if employee is not found
-                    } 
-                } catch(Exception e) {
-                    e.printStackTrace();// print technical error info
-                }
-            }
-        }
-        // check if payroll staff logged in
-        if(username.equals("payroll_staff") && password.equals("12345")) {
-            while(true) {
-                System.out.println("\n1. Process Payroll");
-                System.out.println("\n2. Exit Program");
-                int choice = scanner.nextInt();
-                scanner.nextLine();
-                if (choice == 2) {
-                    break;
-                } else if (choice != 1) {
-                    System.out.println("Invalid choice. Please input 1 or 2 only.");
-                    continue;
-                }
-                
-                System.out.println("\n1. One Employee");
-                System.out.println("\n2. All Employees");
-                System.out.println("\n3. Exit Program");
-                int subChoice = scanner.nextInt();
-                scanner.nextLine();
-                if (subChoice == 3) {
-                    break;
-                } else if(subChoice != 1 && subChoice != 2) {
-                    System.out.println("Invalid choice. Please input 1-3 only.");
-                    continue;
-                }
-                
-                if(subChoice == 1) {
-                    System.out.print("Enter Employee Number: ");
-                    String empNo  = scanner.nextLine();
-                    processPayrollForEmp(empNo, EMP_FILE, attendanceRecords); // call payroll processor method
-                }
-                
-                if(subChoice == 2) {
-                    try(BufferedReader br = new BufferedReader(new FileReader(EMP_FILE))) {
-                        br.readLine(); // skip header
-                        String line;
-                        while((line = br.readLine()) != null) { // loop all employees
-                            if(line.trim().isEmpty()) { // skip blanks
-                                continue;
-                            }
-                            String empNo = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")[0]; // extract employee ids
-                            processPayrollForEmp(empNo, EMP_FILE, attendanceRecords); // call payroll processor method to process payroll for each employee
-                        }
-                    } catch(Exception e) {
-                        e.printStackTrace(); // error handling again
-                    }
-                }
-            }
+        else {
+            System.out.println("Incorrect username or password");
         }
     }
 }    
