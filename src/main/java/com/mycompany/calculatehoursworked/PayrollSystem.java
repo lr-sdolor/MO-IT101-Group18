@@ -186,70 +186,121 @@ public class PayrollSystem {
 
     // ================= MAIN =================
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+    Scanner sc = new Scanner(System.in);
 
-        List<Employee> employees = loadEmployees(EMPLOYEE_FILE_PATH);
-        List<Attendance> records = loadAttendance(ATTENDANCE_FILE_PATH);
+    List<Employee> employees = loadEmployees(EMPLOYEE_FILE_PATH);
+    List<Attendance> records = loadAttendance(ATTENDANCE_FILE_PATH);
 
-        Map<String, Employee> map = new HashMap<>();
-        for (Employee e : employees) map.put(e.empNo, e);
+    Map<String, Employee> map = new HashMap<>();
+    for (Employee e : employees) map.put(e.empNo, e);
 
-        System.out.println("====================================");
-System.out.println("      MOTORPH PAYROLL SYSTEM        ");
-System.out.println("====================================");
-System.out.print("Username: ");
-        String user = sc.nextLine();
-        System.out.print("Password: ");
-        String pass = sc.nextLine();
+    System.out.println("====================================");
+    System.out.println("      MOTORPH PAYROLL SYSTEM        ");
+    System.out.println("====================================");
 
-        if (user.equals("employee") && pass.equals("12345")) {
+    System.out.print("Username: ");
+    String user = sc.nextLine().trim();
 
-    System.out.print("Enter Employee #: ");
-    String id = sc.nextLine();
+    System.out.print("Password: ");
+    String pass = sc.nextLine().trim();
 
-    Employee e = map.get(id);
+    // ================= EMPLOYEE LOGIN =================
+    if (user.equals("employee") && pass.equals("12345")) {
 
-    if (e == null) {
-        System.out.println("Employee not found.");
-        return;
-    }
+        System.out.print("Enter Employee #: ");
+        String id = sc.nextLine();
 
-    while (true) {
-        System.out.println("\n==== EMPLOYEE MENU ====");
-        System.out.println("1. View Employee Details");
-        System.out.println("2. View Payroll");
-        System.out.println("3. Exit");
+        Employee e = map.get(id);
 
-        System.out.print("Enter choice: ");
-        int choice = sc.nextInt();
-        sc.nextLine();
+        if (e == null) {
+            System.out.println("Employee not found.");
+            return;
+        }
 
-        if (choice == 3) break;
+        while (true) {
+            System.out.println("\n==== EMPLOYEE MENU ====");
+            System.out.println("1. View Employee Details");
+            System.out.println("2. View Payroll");
+            System.out.println("3. Exit");
 
-        switch (choice) {
+            System.out.print("Enter choice: ");
+            int choice = sc.nextInt();
+            sc.nextLine();
 
-            case 1:
-                System.out.println("\n===== EMPLOYEE DETAILS =====");
-                System.out.println("Employee #: " + e.empNo);
-                System.out.println("Name: " + e.lastName + ", " + e.firstName);
-                System.out.println("Birthday: " + e.birthday);
-                System.out.println("Hourly Rate: " + e.hourlyRate);
-                break;
+            if (choice == 3) break;
 
-            case 2:
+            switch (choice) {
+                case 1:
+                    System.out.println("\n===== EMPLOYEE DETAILS =====");
+                    System.out.println("Employee #: " + e.empNo);
+                    System.out.println("Name: " + e.lastName + ", " + e.firstName);
+                    System.out.println("Birthday: " + e.birthday);
+                    System.out.println("Hourly Rate: " + e.hourlyRate);
+                    break;
+
+                case 2:
+                    for (int m = 6; m <= 12; m++) {
+                        double[] hrs = computeAttendance(e.empNo, records, m);
+                        displayPayroll(e, hrs[0], hrs[1], m);
+                    }
+                    break;
+
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        }
+
+    // ================= PAYROLL STAFF LOGIN =================
+    } else if (user.equals("payroll_staff") && pass.equals("12345")) {
+
+        while (true) {
+            System.out.println("\n==== PAYROLL MENU ====");
+            System.out.println("1. Process One Employee");
+            System.out.println("2. Process All Employees");
+            System.out.println("3. Exit");
+
+            System.out.print("Enter choice: ");
+            int choice = sc.nextInt();
+            sc.nextLine();
+
+            if (choice == 3) break;
+
+            if (choice == 1) {
+                System.out.print("Enter Employee #: ");
+                String id = sc.nextLine();
+
+                Employee e = map.get(id);
+
+                if (e == null) {
+                    System.out.println("Employee not found.");
+                    continue;
+                }
+
                 for (int m = 6; m <= 12; m++) {
-                    double[] hrs = computeAttendance(e.empNo, records, m);
+                    double[] hrs = computeAttendance(id, records, m);
                     displayPayroll(e, hrs[0], hrs[1], m);
                 }
-                break;
 
-            default:
+            } else if (choice == 2) {
+
+                for (Employee e : employees) {
+                    System.out.println("\n====================================");
+                    System.out.println("Processing Employee: " + e.empNo);
+
+                    for (int m = 6; m <= 12; m++) {
+                        double[] hrs = computeAttendance(e.empNo, records, m);
+                        displayPayroll(e, hrs[0], hrs[1], m);
+                    }
+                }
+
+            } else {
                 System.out.println("Invalid choice.");
+            }
         }
-    }
 
-} else {
-    System.out.println("Invalid login.");
-}
+    // ================= INVALID LOGIN =================
+    } else {
+        System.out.println("Invalid login.");
     }
+}
 }
