@@ -555,12 +555,17 @@ public class PayrollSystem {
         }
     }    
     // ==== MAIN PROGRAM ====
-    // executio of the Java program starts here
+    // execution of the Java program starts here
 
     /**
      *
      * @param args
      */
+
+     private static boolean authenticate(String username, String password) {
+        return (username.equals("employee") && password.equals("12345")) ||
+               (username.equals("payroll_staff") && password.equals("12345"));
+    }
     
     public static void main(String[] args) {
 
@@ -576,16 +581,19 @@ public class PayrollSystem {
         System.out.print("Password: ");
         String password = scanner.nextLine().trim();
 
-        if(username.equals("employee") && password.equals("12345")) {
-            System.out.println("Login Successful!");
-            handleEmployeeFlow(scanner, employees);
-        }
-        else if (username.equals("payroll_staff") && password.equals("12345")) {
-            System.out.println("Login Successful!");
-            handlePayrollFlow(scanner, employees, attendanceRecords);
-        }
-        else {
-            System.out.println("Incorrect username or password");
+        if (authenticate(username, password)) {
+            System.out.println("Login Successful!"); // show success message
+
+            // continue to employee menu if employee logs in
+            if (username.equals("employee")) {
+                handleEmployeeFlow(scanner, employees);
+            }
+            // continue to payroll menu if payroll staff logs in
+            else if (username.equals("payroll_staff")) {
+                handlePayrollFlow(scanner, employees, attendanceRecords);
+            }
+        } else {
+            System.out.println("Incorrect username or password"); // show error message
         }
     }
 }    
