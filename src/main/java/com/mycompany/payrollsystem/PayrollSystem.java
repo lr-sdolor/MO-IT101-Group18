@@ -433,7 +433,7 @@ public class PayrollSystem {
     // helper method for processing payroll for employee
     // for one employee across multiple months
         // finds employee using employee number
-    public static String[] findEmployee(List<String[]> employees, String empNo) {
+    public static String[] getEmployeeData(List<String[]> employees, String empNo) {
         for (String[] emp : employees) {
             if (emp[COL_EMP_NO].equals(empNo)) {
                 return emp;
@@ -500,7 +500,7 @@ public class PayrollSystem {
             System.out.print("Enter Employee Number: ");
             String empNo = scanner.nextLine();
 
-            String[] emp = findEmployee(employees, empNo);
+            String[] emp = getEmployeeData(employees, empNo);
 
             if(emp != null) {
                 System.out.println("\n===================================");
@@ -541,7 +541,7 @@ public class PayrollSystem {
                 System.out.print("Enter Employee Number: ");
                 String empNo = scanner.nextLine();
 
-                String[] emp = findEmployee(employees, empNo);
+                String[] emp = getEmployeeData(employees, empNo);
 
                 if(emp != null)
                     processPayrollForEmployee(emp, records);
