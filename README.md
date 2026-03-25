@@ -7,19 +7,33 @@ MotorPH Payroll System Phase 1 for Computer Programming 1
 ## Developers
 
 Synen Dolor
-- Lead Developer and Code Reviewer. Responsible for structuring the overall codebase and implementing the main program logic. Integrated the different components of the system, handled file processing, debugging, and ensured that the code followed a consistent structure. Also reviewed and refined the computation logic drafted during the planning phase.
+- Lead Developer and Code Reviewer. Responsible for structuring the overall codebase and implementing the main program logic.
+- Integrated all the required components of the system, handled file processing, debugging, and ensured that the code followed a consistent structure.
+- Also reviewed and refined the computation logic drafted during the planning phase.
+- Executed 12 test cases
+- Reviewed peers' pull requests/commits/merge requests
+- Refactored attendance file handling as per feedback
 
 Moriah Edoc
-- Participated in drafting the initial logic for the hours computation and deduction rules during the planning stage and contributed ideas for how the calculations should be handled in the program. Also reviewed and refined the computation logic drafted during the planning phase.
+- Participated in drafting the initial logic for the hours computation and deduction rules during the planning stage and contributed ideas for how the calculations should be handled in the program.
+- Also reviewed and refined the computation logic drafted during the planning phase.
+- Executed 12 test cases
+- Refactored menu handling and polished login and processing system as per feedback
 
 John Merick Carryle Tarcena
 - Assisted in the initial drafting of the computation and deduction logic and provided input during the early planning and review discussions.
+- Created 2 test cases
+- Refactored authenticate method as per feedback
 
 Yves Lauren Marcaida
 - Contributed to drafting the computation approach and participated in reviewing the proposed deduction logic during the design phase.
+- Created 6 test cases
+- Fixed computeHours logic and typo as per feedback
 
 Ma. Diana Salvidar
 - Assisted in outlining the hours computation and deduction rules and participated in discussions regarding how these should be applied in the system.
+- Created 14 test cases
+- Refactored getEmployeeData as per feedback
 
 MotorPH Payroll System Development Team
 
@@ -28,6 +42,16 @@ MotorPH Payroll System Development Team
 # MotorPH Payroll System
 
 A Java-based payroll processing system that allows employees to view employee details and payroll staff to compute and process payroll for one or all employees. The program handles attendance, computes hours worked, and calculates deductions and taxes.
+
+Please input the following log in credentials:
+
+Employee
+- Username: employee
+- Password: 12345
+
+Payroll Staff
+- Username: payroll_staff
+- Password: 12345
 
 ---
 
