@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  *
- * @author synen test 1
+ * @author synen
  */
 
 class Attendance {
