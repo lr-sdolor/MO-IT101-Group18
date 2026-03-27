@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // ===== MAIN CLASS =====
-// declare a public class named PayrollSystem
+// declare a PayrollSystem
 // all program logic exists inside this class
 
 /**
